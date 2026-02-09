@@ -1,0 +1,51 @@
+name: PR para Developer
+
+on:
+  pull_request:
+    branches:
+      - developer
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  validate-branch:
+    name: Validar Branch de Origem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar branch de origem
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "Branch de origem: $BRANCH"
+
+          if [[ "$BRANCH" =~ ^(feature|fix|hotfix)/ ]]; then
+            echo "✅ Branch válida para PR em developer"
+          else
+            echo "❌ PRs para developer devem vir de feature/*, fix/* ou hotfix/*"
+            exit 1
+          fi
+
+  ci:
+    name: CI Checks
+    runs-on: ubuntu-latest
+    needs: validate-branch
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Testes
+        run: npm test
+
+      - name: Build
+        run: npm run build
