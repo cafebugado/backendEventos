@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Query,
   Patch,
   Put,
   Param,
@@ -21,6 +22,7 @@ import {
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
+import { FindAllEventsDto } from './dto/find-all-events.dto';
 
 @ApiTags('events')
 @Controller('events')
@@ -40,15 +42,11 @@ export class EventsController {
     return this.eventsService.create(createEventDto);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all events' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of all events',
-    type: [Event],
-  })
-  findAll(): Event[] {
-    return this.eventsService.findAll();
+@Get()
+  @ApiOperation({ summary: 'List all events with sorting options' })
+  @ApiResponse({ status: 200, description: 'List of all events', type: [Event] })
+  findAll(@Query() query: FindAllEventsDto) {
+    return this.eventsService.findAll(query);
   }
 
   @Get(':id')
