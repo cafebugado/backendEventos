@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
+import { PaginatedResult } from '../../common/interfaces/pagination.interface';
 
 @Injectable()
 export class EventsService {
@@ -25,17 +26,34 @@ export class EventsService {
     return event;
   }
 
-  findAll(query: FindAllEventsDto = {}): Event[] {
-    const { sort = 'date', order = 'asc' } = query;
+  findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
+    const { page = 1, limit = 9, sort = 'date', order = 'asc' } = query;
 
-    return [...this.events].sort((a, b) => {
+    const sortedEvents = [...this.events].sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
       return 0;
-    });
+      });
+   
+  const total = sortedEvents.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    const data = sortedEvents.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
   }
 
   findOne(id: string): Event {

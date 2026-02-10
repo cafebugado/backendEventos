@@ -23,6 +23,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
+import type { PaginatedResult } from '../../common/interfaces/pagination.interface';
 
 @ApiTags('events')
 @Controller('events')
@@ -45,7 +46,7 @@ export class EventsController {
 @Get()
   @ApiOperation({ summary: 'List all events with sorting options' })
   @ApiResponse({ status: 200, description: 'List of all events', type: [Event] })
-  findAll(@Query() query: FindAllEventsDto) {
+  findAll(@Query() query: FindAllEventsDto) : PaginatedResult<Event> {
     return this.eventsService.findAll(query);
   }
 
