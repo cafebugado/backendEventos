@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
+import { FindAllEventsDto } from './dto/find-all-events.dto';
 
 @Injectable()
 export class EventsService {
@@ -24,8 +25,17 @@ export class EventsService {
     return event;
   }
 
-  findAll(): Event[] {
-    return this.events;
+  findAll(query: FindAllEventsDto = {}): Event[] {
+    const { sort = 'date', order = 'asc' } = query;
+
+    return [...this.events].sort((a, b) => {
+      const valueA = a[sort];
+      const valueB = b[sort];
+
+      if (valueA < valueB) return order === 'asc' ? -1 : 1;
+      if (valueA > valueB) return order === 'asc' ? 1 : -1;
+      return 0;
+    });
   }
 
   findOne(id: string): Event {
