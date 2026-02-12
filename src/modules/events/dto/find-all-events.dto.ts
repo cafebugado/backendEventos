@@ -45,7 +45,7 @@ export class FindAllEventsDto {
       const [dia, mes, ano] = value.split('/');
       return new Date(`${ano}-${mes}-${dia}`);
     }
-    return value;
+    return value as unknown;
   })
   @IsDate()
   dateFrom?: Date;
@@ -58,7 +58,7 @@ export class FindAllEventsDto {
       const [dia, mes, ano] = value.split('/');
       return new Date(`${ano}-${mes}-${dia}`);
     }
-    return value;
+    return value as unknown;
   })
   @IsDate()
   dateTo?: Date;
