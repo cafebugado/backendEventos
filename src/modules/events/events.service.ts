@@ -27,18 +27,47 @@ export class EventsService {
   }
 
   findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
-    const { page = 1, limit = 9, sort = 'date', order = 'asc' } = query;
+    const {
+      page = 1,
+      limit = 9,
+      sort = 'date',
+      order = 'asc',
+      isActive,
+      location,
+      dateFrom,
+      dateTo
+    } = query;
 
-    const sortedEvents = [...this.events].sort((a, b) => {
+    let filteredEvents = this.events;
+
+    if (isActive !== undefined) {
+      filteredEvents = filteredEvents.filter(e => e.isActive === isActive);
+    }
+
+    if (location) {
+      const searchLoc = location.toLowerCase();
+      filteredEvents = filteredEvents.filter(e =>
+        e.location?.toLowerCase().includes(searchLoc)
+      );
+    }
+
+    if (dateFrom) {
+      filteredEvents = filteredEvents.filter(e => new Date(e.date) >= dateFrom);
+    }
+    if (dateTo) {
+      filteredEvents = filteredEvents.filter(e => new Date(e.date) <= dateTo);
+    }
+
+    const sortedEvents = [...filteredEvents].sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
       return 0;
-      });
-   
-  const total = sortedEvents.length;
+    });
+
+    const total = sortedEvents.length;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
 
