@@ -24,6 +24,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
+import type { PaginatedResult } from '../../common/interfaces/pagination.interface';
 
 @ApiTags('events')
 @Controller('events')
