@@ -1,21 +1,46 @@
-import { IsIn, IsOptional, IsString, IsBoolean, IsISO8601 } from 'class-validator';
+import {
+  IsIn,
+  IsOptional,
+  IsString,
+  IsBoolean,
+  IsISO8601,
+  IsInt,
+  Max,
+  Min,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class FindAllEventsDto {
   @ApiPropertyOptional({
-    description: 'Sort field for the results',
-    enum: ['date', 'name', 'createdAt'],
-    example: 'date',
+    description: 'Page number for pagination (starts from 1)',
+    example: 1,
+    minimum: 1,
+    type: Number,
   })
   @IsOptional()
-  @Type(() => Number) // Garante que "1" vire o número 1
+  @Transform(({ value }: { value: unknown }) => {
+    if (value === undefined || value === null || value === '') return 1;
+    const num = Number(value);
+    return isNaN(num) || num < 1 ? 1 : Math.floor(num);
+  })
   @IsInt()
   @Min(1)
   page?: number = 1;
 
+  @ApiPropertyOptional({
+    description: 'Number of items per page',
+    example: 9,
+    minimum: 1,
+    maximum: 50,
+    type: Number,
+  })
   @IsOptional()
-  @Type(() => Number)
+  @Transform(({ value }: { value: unknown }) => {
+    if (value === undefined || value === null || value === '') return 9;
+    const num = Number(value);
+    return isNaN(num) || num < 1 ? 9 : Math.min(Math.floor(num), 50);
+  })
   @IsInt()
   @Min(1)
   @Max(50) // Proteção contra sobrecarga
@@ -42,13 +67,13 @@ export class FindAllEventsDto {
     type: Boolean,
   })
   @IsOptional()
-  @Transform(({ value }) => {
+  @Transform(({ value }: { value: unknown }) => {
     if (typeof value === 'boolean') return value;
     if (typeof value === 'string') {
       if (value === 'true' || value === '1') return true;
       if (value === 'false' || value === '0') return false;
     }
-    return value;
+    return undefined;
   })
   @IsBoolean()
   isActive?: boolean;
