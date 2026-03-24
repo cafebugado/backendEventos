@@ -1,5 +1,6 @@
 import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FindAllEventsDto {
   @IsOptional()
@@ -24,4 +25,10 @@ export class FindAllEventsDto {
   @IsString()
   @IsIn(['asc', 'desc'])
   order?: 'asc' | 'desc' = 'asc';
+
+  @ApiPropertyOptional({ description: 'Busca eventos por termo ou descrição' })
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  search?: string;
 }

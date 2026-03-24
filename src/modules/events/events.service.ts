@@ -27,9 +27,19 @@ export class EventsService {
   }
 
   findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
-    const { page = 1, limit = 9, sort = 'date', order = 'asc' } = query;
+    const { page = 1, limit = 9, sort = 'date', order = 'asc', search } = query;
+    let eventsToProcess = this.events;
 
-    const sortedEvents = [...this.events].sort((a, b) => {
+if (search) {
+  const termoBusca = search.toLowerCase();
+  eventsToProcess = eventsToProcess.filter((event) => {
+    const matchName = event.name && event.name.toLowerCase().includes(termoBusca);
+    const matchDesc = event.description && event.description.toLowerCase().includes(termoBusca);
+    return matchName || matchDesc;
+  });
+}
+
+    const sortedEvents = [...eventsToProcess].sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
