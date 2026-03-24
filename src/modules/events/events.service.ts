@@ -26,9 +26,31 @@ export class EventsService {
   }
 
   findAll(query: FindAllEventsDto = {}): Event[] {
-    const { sort = 'date', order = 'asc' } = query;
+    const { sort = 'date', order = 'asc', isActive, location, startDate, endDate } = query;
 
-    return [...this.events].sort((a, b) => {
+    let filteredEvents = [...this.events];
+
+    if (isActive !== undefined) {
+      filteredEvents = filteredEvents.filter(event => event.isActive === isActive);
+    }
+
+    if (location) {
+      filteredEvents = filteredEvents.filter(event =>
+        event.location.toLowerCase().includes(location.toLowerCase())
+      );
+    }
+
+    if (startDate) {
+      const start = new Date(startDate);
+      filteredEvents = filteredEvents.filter(event => event.date >= start);
+    }
+
+    if (endDate) {
+      const end = new Date(endDate);
+      filteredEvents = filteredEvents.filter(event => event.date <= end);
+    }
+
+    return filteredEvents.sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
