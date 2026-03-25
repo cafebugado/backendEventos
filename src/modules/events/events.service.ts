@@ -27,8 +27,6 @@ export class EventsService {
 
   findAll(query: FindAllEventsDto = {}): Event[] {
     const {
-      page = 1,
-      limit = 9,
       sort = 'date',
       order = 'asc',
       isActive,
