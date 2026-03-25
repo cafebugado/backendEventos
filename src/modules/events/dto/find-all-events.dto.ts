@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   IsIn,
   IsOptional,
@@ -10,6 +11,11 @@ import {
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
+=======
+import { IsBoolean, IsDate, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+>>>>>>> developer
 
 export class FindAllEventsDto {
   @ApiPropertyOptional({
@@ -19,11 +25,15 @@ export class FindAllEventsDto {
     type: Number,
   })
   @IsOptional()
+<<<<<<< HEAD
   @Transform(({ value }: { value: unknown }) => {
     if (value === undefined || value === null || value === '') return 1;
     const num = Number(value);
     return isNaN(num) || num < 1 ? 1 : Math.floor(num);
   })
+=======
+  @Type(() => Number)
+>>>>>>> developer
   @IsInt()
   @Min(1)
   page?: number = 1;
@@ -43,7 +53,7 @@ export class FindAllEventsDto {
   })
   @IsInt()
   @Min(1)
-  @Max(50) // Proteção contra sobrecarga
+  @Max(50)
   limit?: number = 9;
 
   @IsOptional()
@@ -59,6 +69,7 @@ export class FindAllEventsDto {
   @IsOptional()
   @IsString()
   @IsIn(['asc', 'desc'])
+<<<<<<< HEAD
   order?: 'asc' | 'desc';
 
   @ApiPropertyOptional({
@@ -82,10 +93,22 @@ export class FindAllEventsDto {
     description: 'Filter events by location (case-insensitive partial match)',
     example: 'São Paulo',
   })
+=======
+  order?: 'asc' | 'desc' = 'asc';
+  
+  @ApiPropertyOptional({ description: 'Filtrar por status (true/false)' })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true') 
+  isActive?: boolean;
+
+  @ApiPropertyOptional({ description: 'Filtrar por local' })
+>>>>>>> developer
   @IsOptional()
   @IsString()
   location?: string;
 
+<<<<<<< HEAD
   @ApiPropertyOptional({
     description: 'Filter events starting from this date (ISO 8601 format)',
     example: '2026-01-01T00:00:00.000Z',
@@ -102,3 +125,31 @@ export class FindAllEventsDto {
   @IsISO8601()
   endDate?: string;
 }
+=======
+  @ApiPropertyOptional({ description: 'Data inicial (DD/MM/AAAA)' })
+  @IsOptional()
+  @Transform(({ value }) => {
+
+    if (value && typeof value === 'string') {
+      const [dia, mes, ano] = value.split('/');
+      return new Date(`${ano}-${mes}-${dia}`);
+    }
+    return value as unknown;
+  })
+  @IsDate()
+  dateFrom?: Date;
+
+  @ApiPropertyOptional({ description: 'Data final (DD/MM/AAAA)' })
+  @IsOptional()
+  @Transform(({ value }) => {
+
+    if (value && typeof value === 'string') {
+      const [dia, mes, ano] = value.split('/');
+      return new Date(`${ano}-${mes}-${dia}`);
+    }
+    return value as unknown;
+  })
+  @IsDate()
+  dateTo?: Date;
+}
+>>>>>>> developer

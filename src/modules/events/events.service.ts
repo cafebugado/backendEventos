@@ -25,12 +25,20 @@ export class EventsService {
     return event;
   }
 
+<<<<<<< HEAD
   findAll(query: FindAllEventsDto = {}): Event[] {
     const {
+=======
+  findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
+    const {
+      page = 1,
+      limit = 9,
+>>>>>>> developer
       sort = 'date',
       order = 'asc',
       isActive,
       location,
+<<<<<<< HEAD
       startDate,
       endDate,
     } = query;
@@ -60,6 +68,33 @@ export class EventsService {
     }
 
     return filteredEvents.sort((a, b) => {
+=======
+      dateFrom,
+      dateTo
+    } = query;
+
+    let filteredEvents = this.events;
+
+    if (isActive !== undefined) {
+      filteredEvents = filteredEvents.filter(e => e.isActive === isActive);
+    }
+
+    if (location) {
+      const searchLoc = location.toLowerCase();
+      filteredEvents = filteredEvents.filter(e =>
+        e.location?.toLowerCase().includes(searchLoc)
+      );
+    }
+
+    if (dateFrom) {
+      filteredEvents = filteredEvents.filter(e => new Date(e.date) >= dateFrom);
+    }
+    if (dateTo) {
+      filteredEvents = filteredEvents.filter(e => new Date(e.date) <= dateTo);
+    }
+
+    const sortedEvents = [...filteredEvents].sort((a, b) => {
+>>>>>>> developer
       const valueA = a[sort];
       const valueB = b[sort];
 
@@ -67,6 +102,26 @@ export class EventsService {
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
       return 0;
     });
+<<<<<<< HEAD
+=======
+
+    const total = sortedEvents.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    const data = sortedEvents.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
+>>>>>>> developer
   }
 
   findOne(id: string): Event {
