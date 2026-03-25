@@ -67,6 +67,12 @@ export class FindAllEventsDto {
     type: Boolean,
   })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true' || value === '1' || value === 1) return true;
+    if (value === 'false' || value === '0' || value === 0) return false;
+    if (typeof value === 'boolean') return value;
+    return undefined;
+  })
   @IsBoolean()
   isActive?: boolean;
 

@@ -25,8 +25,13 @@ export class EventsService {
     return event;
   }
 
-  findAll(query: FindAllEventsDto = {}): Event[] {
+  findAll(query: FindAllEventsDto = {}): {
+    data: Event[];
+    meta: { total: number; page: number; limit: number; totalPages: number };
+  } {
     const {
+      page = 1,
+      limit = 9,
       sort = 'date',
       order = 'asc',
       isActive,
@@ -58,7 +63,7 @@ export class EventsService {
       filteredEvents = filteredEvents.filter((event) => event.date <= end);
     }
 
-    return filteredEvents.sort((a, b) => {
+    const sortedEvents = filteredEvents.sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
@@ -66,6 +71,22 @@ export class EventsService {
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
       return 0;
     });
+
+    const total = sortedEvents.length;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedData = sortedEvents.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: paginatedData,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
   }
 
   findOne(id: string): Event {

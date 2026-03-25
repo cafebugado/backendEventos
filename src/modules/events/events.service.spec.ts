@@ -49,6 +49,11 @@ describe('EventsService', () => {
   });
 
   describe('findAll', () => {
+    beforeEach(() => {
+      // Reset the service state before each test
+      service = module.get<EventsService>(EventsService);
+    });
+
     it('should return an empty list with meta initially', () => {
       const result = service.findAll({ page: 1, limit: 10 });
 
