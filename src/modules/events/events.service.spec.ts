@@ -4,6 +4,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto';
 
 describe('EventsService', () => {
+  let module: TestingModule;
   let service: EventsService;
 
   const createEventDto: CreateEventDto = {
@@ -15,7 +16,7 @@ describe('EventsService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [EventsService],
     }).compile();
 
