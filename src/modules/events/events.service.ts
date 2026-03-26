@@ -3,7 +3,6 @@ import { randomUUID } from 'crypto';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
-import { PaginatedResult } from '../../common/interfaces/pagination.interface';
 
 @Injectable()
 export class EventsService {
@@ -26,7 +25,10 @@ export class EventsService {
     return event;
   }
 
-  findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
+  findAll(query: FindAllEventsDto = {}): {
+    data: Event[];
+    meta: { total: number; page: number; limit: number; totalPages: number };
+  } {
     const {
       page = 1,
       limit = 9,
@@ -34,31 +36,34 @@ export class EventsService {
       order = 'asc',
       isActive,
       location,
-      dateFrom,
-      dateTo
+      startDate,
+      endDate,
     } = query;
 
     let filteredEvents = this.events;
 
     if (isActive !== undefined) {
-      filteredEvents = filteredEvents.filter(e => e.isActive === isActive);
+      filteredEvents = filteredEvents.filter((e) => e.isActive === isActive);
     }
 
     if (location) {
       const searchLoc = location.toLowerCase();
-      filteredEvents = filteredEvents.filter(e =>
-        e.location?.toLowerCase().includes(searchLoc)
+      filteredEvents = filteredEvents.filter((e) =>
+        e.location?.toLowerCase().includes(searchLoc),
       );
     }
 
-    if (dateFrom) {
-      filteredEvents = filteredEvents.filter(e => new Date(e.date) >= dateFrom);
-    }
-    if (dateTo) {
-      filteredEvents = filteredEvents.filter(e => new Date(e.date) <= dateTo);
+    if (startDate) {
+      const start = new Date(startDate);
+      filteredEvents = filteredEvents.filter((event) => event.date >= start);
     }
 
-    const sortedEvents = [...filteredEvents].sort((a, b) => {
+    if (endDate) {
+      const end = new Date(endDate);
+      filteredEvents = filteredEvents.filter((event) => event.date <= end);
+    }
+
+    const sortedEvents = filteredEvents.sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
@@ -70,12 +75,11 @@ export class EventsService {
     const total = sortedEvents.length;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-
-    const data = sortedEvents.slice(startIndex, endIndex);
+    const paginatedData = sortedEvents.slice(startIndex, endIndex);
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data,
+      data: paginatedData,
       meta: {
         total,
         page,
