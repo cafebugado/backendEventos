@@ -27,7 +27,7 @@ export class EventsService {
   }
 
   findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
-    const { page = 1, limit = 9, sort = 'date', order = 'asc', search } = query;
+    const { page = 1, limit = 9, sort = 'date', order = 'asc', search, periodo } = query;
     let eventsToProcess = this.events;
 
 if (search) {
@@ -38,6 +38,18 @@ if (search) {
     return matchName || matchDesc;
   });
 }
+
+if (periodo) {
+      eventsToProcess = eventsToProcess.filter((event) => {
+        const hora = new Date(event.date).getHours();
+        
+        if (periodo === 'matutino') return hora >= 6 && hora < 12;
+        if (periodo === 'vespertino') return hora >= 12 && hora < 18;
+        if (periodo === 'noturno') return hora >= 18 || hora < 6;
+        
+        return true;
+      });
+    }
 
     const sortedEvents = [...eventsToProcess].sort((a, b) => {
       const valueA = a[sort];
