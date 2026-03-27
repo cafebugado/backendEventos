@@ -32,14 +32,14 @@ export class FindAllEventsDto {
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   search?: string;
 
-  @ApiPropertyOptional({ 
+  @ApiPropertyOptional({
     description: 'Filtra eventos pelo período do dia',
-    enum: ['matutino', 'vespertino', 'noturno'] 
+    enum: ['matutino', 'vespertino', 'noturno']
   })
   @IsOptional()
   @IsString()
-  @IsIn(['matutino', 'vespertino', 'noturno'], { 
-    message: 'Período inválido. Use: matutino, vespertino ou noturno' 
+  @IsIn(['matutino', 'vespertino', 'noturno'], {
+    message: 'Período inválido. Use: matutino, vespertino ou noturno'
   })
   periodo?: 'matutino' | 'vespertino' | 'noturno';
 }
