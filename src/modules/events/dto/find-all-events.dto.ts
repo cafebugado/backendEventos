@@ -1,5 +1,5 @@
-import { IsEnum, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { Type, Transform } from 'class-transformer';
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Type, Transform, TransformFnParams } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FindAllEventsDto {
@@ -29,17 +29,19 @@ export class FindAllEventsDto {
   @ApiPropertyOptional({ description: 'Busca eventos por termo ou descrição' })
   @IsOptional()
   @IsString()
-  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @Transform(({ value }: TransformFnParams): string => {
+    return typeof value === 'string' ? value.trim() : String(value);
+  })
   search?: string;
 
   @ApiPropertyOptional({
     description: 'Filtra eventos pelo período do dia',
-    enum: ['matutino', 'vespertino', 'noturno']
+    enum: ['matutino', 'vespertino', 'noturno'],
   })
   @IsOptional()
   @IsString()
   @IsIn(['matutino', 'vespertino', 'noturno'], {
-    message: 'Período inválido. Use: matutino, vespertino ou noturno'
+    message: 'Período inválido. Use: matutino, vespertino ou noturno',
   })
   periodo?: 'matutino' | 'vespertino' | 'noturno';
 }

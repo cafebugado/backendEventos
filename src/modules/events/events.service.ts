@@ -28,14 +28,24 @@ export class EventsService {
   }
 
   findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
-    const { page = 1, limit = 9, sort = 'date', order = 'asc', search, periodo } = query;
+    const {
+      page = 1,
+      limit = 9,
+      sort = 'date',
+      order = 'asc',
+      search,
+      periodo,
+    } = query;
     let eventsToProcess = this.events;
 
     if (search) {
       const termoBusca = search.toLowerCase();
       eventsToProcess = eventsToProcess.filter((event) => {
-        const matchName = event.name && event.name.toLowerCase().includes(termoBusca);
-        const matchDesc = event.description && event.description.toLowerCase().includes(termoBusca);
+        const matchName =
+          event.name && event.name.toLowerCase().includes(termoBusca);
+        const matchDesc =
+          event.description &&
+          event.description.toLowerCase().includes(termoBusca);
         return matchName || matchDesc;
       });
     }
@@ -125,7 +135,7 @@ export class EventsService {
 
         return stats;
       },
-      { total: 0, matutino: 0, vespertino: 0, noturno: 0 }
+      { total: 0, matutino: 0, vespertino: 0, noturno: 0 },
     );
   }
 
