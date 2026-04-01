@@ -4,6 +4,7 @@ import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
 import { PaginatedResult } from '../../common/interfaces/pagination.interface';
+import { EventStatsDto } from './dto/event-stats.dto';
 
 @Injectable()
 export class EventsService {
@@ -27,17 +28,29 @@ export class EventsService {
   }
 
   findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
-    const { page = 1, limit = 9, sort = 'date', order = 'asc', search } = query;
+    const { page = 1, limit = 9, sort = 'date', order = 'asc', search, periodo } = query;
     let eventsToProcess = this.events;
 
-if (search) {
-  const termoBusca = search.toLowerCase();
-  eventsToProcess = eventsToProcess.filter((event) => {
-    const matchName = event.name && event.name.toLowerCase().includes(termoBusca);
-    const matchDesc = event.description && event.description.toLowerCase().includes(termoBusca);
-    return matchName || matchDesc;
-  });
-}
+    if (search) {
+      const termoBusca = search.toLowerCase();
+      eventsToProcess = eventsToProcess.filter((event) => {
+        const matchName = event.name && event.name.toLowerCase().includes(termoBusca);
+        const matchDesc = event.description && event.description.toLowerCase().includes(termoBusca);
+        return matchName || matchDesc;
+      });
+    }
+
+    if (periodo) {
+      eventsToProcess = eventsToProcess.filter((event) => {
+        const hora = new Date(event.date).getHours();
+
+        if (periodo === 'matutino') return hora >= 6 && hora < 12;
+        if (periodo === 'vespertino') return hora >= 12 && hora < 18;
+        if (periodo === 'noturno') return hora >= 18 || hora < 6;
+
+        return true;
+      });
+    }
 
     const sortedEvents = [...eventsToProcess].sort((a, b) => {
       const valueA = a[sort];
@@ -46,9 +59,9 @@ if (search) {
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
       return 0;
-      });
-   
-  const total = sortedEvents.length;
+    });
+
+    const total = sortedEvents.length;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
 
@@ -100,5 +113,27 @@ if (search) {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
     this.events.splice(eventIndex, 1);
+  }
+
+  getStats(): EventStatsDto {
+    return this.events.reduce(
+      (stats, event) => {
+        const periodo = this.getPeriodFromDate(event.date);
+
+        stats.total += 1;
+        stats[periodo] += 1;
+
+        return stats;
+      },
+      { total: 0, matutino: 0, vespertino: 0, noturno: 0 }
+    );
+  }
+
+  private getPeriodFromDate(date: Date): 'matutino' | 'vespertino' | 'noturno' {
+    const hora = new Date(date).getHours();
+
+    if (hora >= 6 && hora < 12) return 'matutino';
+    if (hora >= 12 && hora < 18) return 'vespertino';
+    return 'noturno';
   }
 }

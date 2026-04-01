@@ -1,10 +1,10 @@
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEnum, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FindAllEventsDto {
   @IsOptional()
-  @Type(() => Number) // Garante que "1" vire o número 1
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number = 1;
@@ -13,7 +13,7 @@ export class FindAllEventsDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  @Max(50) // Proteção contra sobrecarga
+  @Max(50)
   limit?: number = 9;
 
   @IsOptional()
@@ -31,4 +31,15 @@ export class FindAllEventsDto {
   @IsString()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filtra eventos pelo período do dia',
+    enum: ['matutino', 'vespertino', 'noturno']
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['matutino', 'vespertino', 'noturno'], {
+    message: 'Período inválido. Use: matutino, vespertino ou noturno'
+  })
+  periodo?: 'matutino' | 'vespertino' | 'noturno';
 }
