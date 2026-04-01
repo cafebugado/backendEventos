@@ -62,7 +62,17 @@ export class EventsService {
       });
     }
 
-    const sortedEvents = [...eventsToProcess].sort((a, b) => {
+    if (startDate) {
+      const start = new Date(startDate);
+      filteredEvents = filteredEvents.filter((event) => event.date >= start);
+    }
+
+    if (endDate) {
+      const end = new Date(endDate);
+      filteredEvents = filteredEvents.filter((event) => event.date <= end);
+    }
+
+    const sortedEvents = filteredEvents.sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
@@ -74,12 +84,11 @@ export class EventsService {
     const total = sortedEvents.length;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-
-    const data = sortedEvents.slice(startIndex, endIndex);
+    const paginatedData = sortedEvents.slice(startIndex, endIndex);
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data,
+      data: paginatedData,
       meta: {
         total,
         page,

@@ -4,6 +4,7 @@ import { EventsService } from './events.service';
 import { CreateEventDto } from './dto';
 
 describe('EventsService', () => {
+  let module: TestingModule;
   let service: EventsService;
 
   const createEventDto: CreateEventDto = {
@@ -15,7 +16,7 @@ describe('EventsService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       providers: [EventsService],
     }).compile();
 
@@ -49,19 +50,26 @@ describe('EventsService', () => {
   });
 
   describe('findAll', () => {
-    it('should return an empty array initially', () => {
-      const events = service.findAll();
-
-      expect(events).toEqual([]);
+    beforeEach(() => {
+      // Reset the service state before each test
+      service = module.get<EventsService>(EventsService);
     });
 
-    it('should return all created events', () => {
+    it('should return an empty list with meta initially', () => {
+      const result = service.findAll({ page: 1, limit: 10 });
+
+      expect(result.data).toEqual([]);
+      expect(result.meta).toBeDefined();
+    });
+
+    it('should return paginated events', () => {
       service.create(createEventDto);
       service.create({ ...createEventDto, name: 'Second Event' });
 
-      const events = service.findAll();
+      const result = service.findAll({ page: 1, limit: 10 });
 
-      expect(events).toHaveLength(2);
+      expect(result.data).toHaveLength(2);
+      expect(result.meta.total).toBe(2);
     });
   });
 
