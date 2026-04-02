@@ -4,10 +4,15 @@ import { UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-    handleRequest(err, user, info) {
+  handleRequest(err: unknown, user: unknown): any {
     if (err || !user) {
-      throw err || new UnauthorizedException('Acesso negado: Token ausente ou inválido');
+      if (err instanceof Error) {
+        throw err;
+      }
+      throw new UnauthorizedException(
+        'Acesso negado: Token ausente ou inválido',
+      );
     }
     return user;
-    }
+  }
 }

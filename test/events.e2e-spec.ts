@@ -1,7 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import supertest from 'supertest';
 import { AppModule } from '../src/app.module';
+
+interface EventResponse {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+}
 
 describe('EventsController (e2e)', () => {
   let app: INestApplication;
@@ -43,9 +51,11 @@ describe('EventsController (e2e)', () => {
         .expect(201);
 
       expect(response.body).toHaveProperty('id');
-      expect(response.body.name).toBe(createEventDto.name);
-      expect(response.body.description).toBe(createEventDto.description);
-      expect(response.body.isActive).toBe(true);
+      expect((response.body as EventResponse).name).toBe(createEventDto.name);
+      expect((response.body as EventResponse).description).toBe(
+        createEventDto.description,
+      );
+      expect((response.body as EventResponse).isActive).toBe(true);
 
       createdEventId = response.body.id;
     });
@@ -72,7 +82,9 @@ describe('EventsController (e2e)', () => {
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThanOrEqual(1);
+      expect((response.body as EventResponse[]).length).toBeGreaterThanOrEqual(
+        1,
+      );
     });
   });
 
@@ -82,8 +94,8 @@ describe('EventsController (e2e)', () => {
         .get(`/events/${createdEventId}`)
         .expect(200);
 
-      expect(response.body.id).toBe(createdEventId);
-      expect(response.body.name).toBe(createEventDto.name);
+      expect((response.body as EventResponse).id).toBe(createdEventId);
+      expect((response.body as EventResponse).name).toBe(createEventDto.name);
     });
 
     it('should return 404 for non-existent event', async () => {
@@ -111,8 +123,10 @@ describe('EventsController (e2e)', () => {
         .send(updateDto)
         .expect(200);
 
-      expect(response.body.name).toBe(updateDto.name);
-      expect(response.body.description).toBe(updateDto.description);
+      expect((response.body as EventResponse).name).toBe(updateDto.name);
+      expect((response.body as EventResponse).description).toBe(
+        updateDto.description,
+      );
     });
 
     it('should return 404 for non-existent event', async () => {

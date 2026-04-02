@@ -9,7 +9,7 @@ describe('JwtStrategy', () => {
     jwtStrategy = new JwtStrategy();
   });
 
-  it('deve extrair e retornar os dados do payload corretamente', async () => {
+  it('deve extrair e retornar os dados do payload corretamente', () => {
     const payload = {
       sub: 'user-123',
       email: 'gaby@teste.com',
@@ -18,7 +18,7 @@ describe('JwtStrategy', () => {
       exp: 789101,
     };
 
-    const result = await jwtStrategy.validate(payload);
+    const result = jwtStrategy.validate(payload);
 
     expect(result).toEqual({
       userId: 'user-123',
@@ -27,8 +27,9 @@ describe('JwtStrategy', () => {
     });
   });
 
-  it('deve retornar undefined ou erro se o payload estiver vazio', async () => {
-    const result = await jwtStrategy.validate({});
-    expect(result.userId).toBeUndefined();
+  it('deve retornar undefined ou erro se o payload estiver vazio', () => {
+    const emptyPayload = { sub: '', email: '', role: '' };
+    const result = jwtStrategy.validate(emptyPayload);
+    expect(result.userId).toBe('');
   });
 });
