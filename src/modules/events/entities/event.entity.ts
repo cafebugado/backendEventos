@@ -38,6 +38,13 @@ export class Event {
   capacity: number;
 
   @ApiProperty({
+    description: 'Period of the event',
+    example: 'noturno',
+    enum: ['matutino', 'vespertino', 'noturno'],
+  })
+  period: string;
+
+  @ApiProperty({
     description: 'Whether the event is active',
     example: true,
   })

@@ -16,6 +16,7 @@ export class EventsService {
       location: createEventDto.location,
       date: new Date(createEventDto.date),
       capacity: createEventDto.capacity,
+      period: createEventDto.period,
       isActive: createEventDto.isActive ?? true,
       createdAt: new Date(),
       updatedAt: new Date(),

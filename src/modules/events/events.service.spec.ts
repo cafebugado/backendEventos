@@ -13,6 +13,7 @@ describe('EventsService', () => {
     location: 'Test Location',
     date: '2026-03-15T09:00:00.000Z',
     capacity: 100,
+    period: 'noturno',
   };
 
   beforeEach(async () => {
