@@ -1,13 +1,5 @@
-import {
-  IsIn,
-  IsOptional,
-  IsString,
-  IsBoolean,
-  IsISO8601,
-  IsInt,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { Type, Transform, TransformFnParams } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
@@ -19,11 +11,7 @@ export class FindAllEventsDto {
     type: Number,
   })
   @IsOptional()
-  @Transform(({ value }: { value: unknown }) => {
-    if (value === undefined || value === null || value === '') return 1;
-    const num = Number(value);
-    return isNaN(num) || num < 1 ? 1 : Math.floor(num);
-  })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number = 1;
@@ -82,21 +70,19 @@ export class FindAllEventsDto {
   })
   @IsOptional()
   @IsString()
-  location?: string;
+  @Transform(({ value }: TransformFnParams): string => {
+    return typeof value === 'string' ? value.trim() : String(value);
+  })
+  search?: string;
 
   @ApiPropertyOptional({
-    description: 'Filter events starting from this date (ISO 8601 format)',
-    example: '2026-01-01T00:00:00.000Z',
+    description: 'Filtra eventos pelo período do dia',
+    enum: ['matutino', 'vespertino', 'noturno'],
   })
   @IsOptional()
-  @IsISO8601()
-  startDate?: string;
-
-  @ApiPropertyOptional({
-    description: 'Filter events until this date (ISO 8601 format)',
-    example: '2026-12-31T23:59:59.999Z',
+  @IsString()
+  @IsIn(['matutino', 'vespertino', 'noturno'], {
+    message: 'Período inválido. Use: matutino, vespertino ou noturno',
   })
-  @IsOptional()
-  @IsISO8601()
-  endDate?: string;
+  periodo?: 'matutino' | 'vespertino' | 'noturno';
 }

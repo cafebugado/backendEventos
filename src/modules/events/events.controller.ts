@@ -24,6 +24,8 @@ import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
+import type { PaginatedResult } from '../../common/interfaces/pagination.interface';
+import { EventStatsDto } from './dto/event-stats.dto';
 
 @ApiTags('events')
 @Controller('events')
@@ -44,52 +46,27 @@ export class EventsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'List all events with sorting options' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all events',
+    type: [Event],
+  })
+  findAll(@Query() query: FindAllEventsDto): PaginatedResult<Event> {
+    return this.eventsService.findAll(query);
+  }
+
+  @Get('stats')
   @ApiOperation({
-    summary: 'List all events with optional filters and sorting',
-  })
-  @ApiQuery({
-    name: 'sort',
-    enum: ['date', 'name', 'createdAt'],
-    description: 'Sort field for the results',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'order',
-    enum: ['asc', 'desc'],
-    description: 'Sort order for the results',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'isActive',
-    type: Boolean,
-    description: 'Filter events by active status',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'location',
-    type: String,
-    description: 'Filter events by location (case-insensitive partial match)',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'startDate',
-    type: String,
-    description: 'Filter events starting from this date (ISO 8601 format)',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'endDate',
-    type: String,
-    description: 'Filter events until this date (ISO 8601 format)',
-    required: false,
+    summary: 'Obter estatísticas consolidadas dos eventos por período',
   })
   @ApiResponse({
     status: 200,
-    description: 'List of filtered and sorted events',
-    type: [Event],
+    description: 'Estatísticas retornadas com sucesso.',
+    type: EventStatsDto,
   })
-  findAll(@Query() query: FindAllEventsDto) {
-    return this.eventsService.findAll(query);
+  getStats(): EventStatsDto {
+    return this.eventsService.getStats();
   }
 
   @Get(':id')
