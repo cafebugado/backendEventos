@@ -1,7 +1,14 @@
-import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { Type, Transform, TransformFnParams } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 
 export class FindAllEventsDto {
   @ApiPropertyOptional({

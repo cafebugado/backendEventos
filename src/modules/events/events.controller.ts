@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,14 +19,12 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
-  ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
-import { UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { PaginatedResult } from '../../common/interfaces/pagination.interface';
 import { EventStatsDto } from './dto/event-stats.dto';

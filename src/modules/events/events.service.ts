@@ -57,17 +57,7 @@ export class EventsService {
       );
     }
 
-    if (startDate) {
-      const start = new Date(startDate);
-      filteredEvents = filteredEvents.filter((event) => event.date >= start);
-    }
-
-    if (endDate) {
-      const end = new Date(endDate);
-      filteredEvents = filteredEvents.filter((event) => event.date <= end);
-    }
-
-    const sortedEvents = filteredEvents.sort((a, b) => {
+    const sortedEvents = [...eventsToProcess].sort((a, b) => {
       const valueA = a[sort];
       const valueB = b[sort];
 
