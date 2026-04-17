@@ -52,15 +52,9 @@ export class EventsService {
     }
 
     if (periodo) {
-      eventsToProcess = eventsToProcess.filter((event) => {
-        const hora = new Date(event.date).getHours();
-
-        if (periodo === 'matutino') return hora >= 6 && hora < 12;
-        if (periodo === 'vespertino') return hora >= 12 && hora < 18;
-        if (periodo === 'noturno') return hora >= 18 || hora < 6;
-
-        return true;
-      });
+      eventsToProcess = eventsToProcess.filter(
+        (event) => this.getPeriodFromDate(event.date) === periodo,
+      );
     }
 
     if (startDate) {
