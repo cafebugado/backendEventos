@@ -3,6 +3,8 @@ import { randomUUID } from 'crypto';
 import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
+import { PaginatedResult } from '../../common/interfaces/pagination.interface';
+import { EventStatsDto } from './dto/event-stats.dto';
 
 @Injectable()
 export class EventsService {
@@ -26,32 +28,39 @@ export class EventsService {
     return event;
   }
 
-  findAll(query: FindAllEventsDto = {}): {
-    data: Event[];
-    meta: { total: number; page: number; limit: number; totalPages: number };
-  } {
+  findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
     const {
       page = 1,
       limit = 9,
       sort = 'date',
       order = 'asc',
-      isActive,
-      location,
-      startDate,
-      endDate,
+      search,
+      periodo,
     } = query;
+    let eventsToProcess = this.events;
 
-    let filteredEvents = this.events;
-
-    if (isActive !== undefined) {
-      filteredEvents = filteredEvents.filter((e) => e.isActive === isActive);
+    if (search) {
+      const termoBusca = search.toLowerCase();
+      eventsToProcess = eventsToProcess.filter((event) => {
+        const matchName =
+          event.name && event.name.toLowerCase().includes(termoBusca);
+        const matchDesc =
+          event.description &&
+          event.description.toLowerCase().includes(termoBusca);
+        return matchName || matchDesc;
+      });
     }
 
-    if (location) {
-      const searchLoc = location.toLowerCase();
-      filteredEvents = filteredEvents.filter((e) =>
-        e.location?.toLowerCase().includes(searchLoc),
-      );
+    if (periodo) {
+      eventsToProcess = eventsToProcess.filter((event) => {
+        const hora = new Date(event.date).getHours();
+
+        if (periodo === 'matutino') return hora >= 6 && hora < 12;
+        if (periodo === 'vespertino') return hora >= 12 && hora < 18;
+        if (periodo === 'noturno') return hora >= 18 || hora < 6;
+
+        return true;
+      });
     }
 
     if (startDate) {
@@ -124,5 +133,27 @@ export class EventsService {
       throw new NotFoundException(`Event with ID "${id}" not found`);
     }
     this.events.splice(eventIndex, 1);
+  }
+
+  getStats(): EventStatsDto {
+    return this.events.reduce(
+      (stats, event) => {
+        const periodo = this.getPeriodFromDate(event.date);
+
+        stats.total += 1;
+        stats[periodo] += 1;
+
+        return stats;
+      },
+      { total: 0, matutino: 0, vespertino: 0, noturno: 0 },
+    );
+  }
+
+  private getPeriodFromDate(date: Date): 'matutino' | 'vespertino' | 'noturno' {
+    const hora = new Date(date).getHours();
+
+    if (hora >= 6 && hora < 12) return 'matutino';
+    if (hora >= 12 && hora < 18) return 'vespertino';
+    return 'noturno';
   }
 }
