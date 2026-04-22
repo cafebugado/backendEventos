@@ -18,6 +18,7 @@ export class EventsService {
       location: createEventDto.location,
       date: new Date(createEventDto.date),
       capacity: createEventDto.capacity,
+      period: createEventDto.period,
       isActive: createEventDto.isActive ?? true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -51,15 +52,9 @@ export class EventsService {
     }
 
     if (periodo) {
-      eventsToProcess = eventsToProcess.filter((event) => {
-        const hora = new Date(event.date).getHours();
-
-        if (periodo === 'matutino') return hora >= 6 && hora < 12;
-        if (periodo === 'vespertino') return hora >= 12 && hora < 18;
-        if (periodo === 'noturno') return hora >= 18 || hora < 6;
-
-        return true;
-      });
+      eventsToProcess = eventsToProcess.filter(
+        (event) => this.getPeriodFromDate(event.date) === periodo,
+      );
     }
 
     const sortedEvents = [...eventsToProcess].sort((a, b) => {

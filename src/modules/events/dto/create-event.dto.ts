@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsBoolean,
   MaxLength,
+  IsEnum,
 } from 'class-validator';
 
 export class CreateEventDto {
@@ -57,6 +58,17 @@ export class CreateEventDto {
   @IsInt()
   @Min(1)
   capacity: number;
+
+  @ApiProperty({
+    description: 'Period of the event',
+    example: 'noturno',
+    enum: ['matutino', 'vespertino', 'noturno'],
+  })
+  @IsEnum(['matutino', 'vespertino', 'noturno'], {
+    message: 'Period must be matutino, vespertino or noturno',
+  })
+  @IsNotEmpty()
+  period: string;
 
   @ApiProperty({
     description: 'Whether the event is active',

@@ -34,6 +34,7 @@ interface PaginatedEventResponse {
 describe('EventsController (e2e)', () => {
   let app: INestApplication;
   let createdEventId: string;
+  let accessToken: string;
 
   const createEventDto = {
     name: 'E2E Test Event',
@@ -41,6 +42,7 @@ describe('EventsController (e2e)', () => {
     location: 'E2E Test Location',
     date: '2026-03-15T09:00:00.000Z',
     capacity: 100,
+    period: 'noturno',
   };
 
   beforeAll(async () => {
@@ -57,6 +59,11 @@ describe('EventsController (e2e)', () => {
       }),
     );
     await app.init();
+
+    const loginResponse = await supertest(app.getHttpServer())
+      .post('/auth/login')
+      .send({ email: 'gaby.gdmc@gmail.com', password: 'cafe7430' });
+    accessToken = loginResponse.body.accessToken;
   });
 
   afterAll(async () => {
@@ -67,6 +74,7 @@ describe('EventsController (e2e)', () => {
     it('should create an event', async () => {
       const response = await supertest(app.getHttpServer())
         .post('/events')
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(createEventDto)
         .expect(201);
 
@@ -156,6 +164,7 @@ describe('EventsController (e2e)', () => {
 
       const response = await supertest(app.getHttpServer())
         .put(`/events/${createdEventId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updateDto)
         .expect(200);
 
@@ -179,6 +188,7 @@ describe('EventsController (e2e)', () => {
 
       const response = await supertest(app.getHttpServer())
         .patch(`/events/${createdEventId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .send(updateDto)
         .expect(200);
 
@@ -188,6 +198,7 @@ describe('EventsController (e2e)', () => {
     it('should return 404 for non-existent event', async () => {
       await supertest(app.getHttpServer())
         .patch('/events/550e8400-e29b-41d4-a716-446655440000')
+        .set('Authorization', `Bearer ${accessToken}`)
         .send({ name: 'Updated' })
         .expect(404);
     });
@@ -197,12 +208,14 @@ describe('EventsController (e2e)', () => {
     it('should delete an event', async () => {
       await supertest(app.getHttpServer())
         .delete(`/events/${createdEventId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(204);
     });
 
     it('should return 404 for non-existent event', async () => {
       await supertest(app.getHttpServer())
         .delete('/events/550e8400-e29b-41d4-a716-446655440000')
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(404);
     });
 

@@ -77,8 +77,8 @@ export class FindAllEventsDto {
   })
   @IsOptional()
   @IsString()
-  @Transform(({ value }: TransformFnParams): string => {
-    return typeof value === 'string' ? value.trim() : String(value);
+  @Transform(({ value }: TransformFnParams): unknown => {
+    return typeof value === 'string' ? value.trim() : value;
   })
   search?: string;
 

@@ -20,6 +20,7 @@ async function bootstrap() {
     .setTitle('Backend Eventos API')
     .setDescription('API para gerenciamento de eventos')
     .setVersion('1.0')
+    .addTag('auth', 'Endpoints de autenticacao e token')
     .addTag('events', 'Endpoints para gerenciamento de eventos')
     .addTag('health', 'Endpoints de health check')
     .addBearerAuth()
