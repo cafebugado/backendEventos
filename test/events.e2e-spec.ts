@@ -11,6 +11,26 @@ interface EventResponse {
   isActive: boolean;
 }
 
+interface PaginatedEventsResponse {
+  data: EventResponse[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+interface PaginatedEventResponse {
+  data: EventResponse[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 describe('EventsController (e2e)', () => {
   let app: INestApplication;
   let createdEventId: string;
@@ -81,10 +101,18 @@ describe('EventsController (e2e)', () => {
         .get('/events')
         .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect((response.body as EventResponse[]).length).toBeGreaterThanOrEqual(
-        1,
-      );
+      const body = response.body as PaginatedEventResponse;
+
+      expect(body).toHaveProperty('data');
+      expect(body).toHaveProperty('meta');
+      expect(Array.isArray(body.data)).toBe(true);
+      expect(body.data.length).toBeGreaterThanOrEqual(1);
+      expect(body.meta).toMatchObject({
+        total: expect.any(Number),
+        page: expect.any(Number),
+        limit: expect.any(Number),
+        totalPages: expect.any(Number),
+      });
     });
   });
 
@@ -94,8 +122,16 @@ describe('EventsController (e2e)', () => {
         .get(`/events/${createdEventId}`)
         .expect(200);
 
-      expect((response.body as EventResponse).id).toBe(createdEventId);
-      expect((response.body as EventResponse).name).toBe(createEventDto.name);
+      const body = response.body as PaginatedEventsResponse;
+
+      expect(body).toHaveProperty('data');
+      expect(body).toHaveProperty('meta');
+      expect(Array.isArray(body.data)).toBe(true);
+      expect(body.data.length).toBeGreaterThanOrEqual(1);
+      expect(body.meta.page).toBe(1);
+      expect(body.meta.limit).toBe(9);
+      expect(body.meta.total).toBeGreaterThanOrEqual(1);
+      expect(body.meta.totalPages).toBeGreaterThanOrEqual(1);
     });
 
     it('should return 404 for non-existent event', async () => {
