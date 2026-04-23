@@ -62,9 +62,19 @@ export class EventsService {
       });
     }
 
-    const sortedEvents = [...eventsToProcess].sort((a, b) => {
-      const valueA = this.getSortValue(a, sort);
-      const valueB = this.getSortValue(b, sort);
+    if (startDate) {
+      const start = new Date(startDate);
+      filteredEvents = filteredEvents.filter((event) => event.date >= start);
+    }
+
+    if (endDate) {
+      const end = new Date(endDate);
+      filteredEvents = filteredEvents.filter((event) => event.date <= end);
+    }
+
+    const sortedEvents = filteredEvents.sort((a, b) => {
+      const valueA = a[sort];
+      const valueB = b[sort];
 
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
@@ -144,20 +154,5 @@ export class EventsService {
     if (hora >= 6 && hora < 12) return 'matutino';
     if (hora >= 12 && hora < 18) return 'vespertino';
     return 'noturno';
-  }
-
-  private getSortValue(
-    event: Event,
-    sort: 'date' | 'name' | 'createdAt',
-  ): number | string {
-    if (sort === 'name') {
-      return event.name.toLowerCase();
-    }
-
-    if (sort === 'createdAt') {
-      return event.createdAt.getTime();
-    }
-
-    return event.date.getTime();
   }
 }
