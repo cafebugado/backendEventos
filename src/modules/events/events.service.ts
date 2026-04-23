@@ -36,11 +36,11 @@ export class EventsService {
       search,
       periodo,
     } = query;
-    let eventsToProcess = this.events;
+    let filteredEvents = this.events;
 
     if (search) {
       const termoBusca = search.toLowerCase();
-      eventsToProcess = eventsToProcess.filter((event) => {
+      filteredEvents = filteredEvents.filter((event) => {
         const matchName =
           event.name && event.name.toLowerCase().includes(termoBusca);
         const matchDesc =
@@ -51,7 +51,7 @@ export class EventsService {
     }
 
     if (periodo) {
-      eventsToProcess = eventsToProcess.filter((event) => {
+      filteredEvents = filteredEvents.filter((event) => {
         const hora = new Date(event.date).getHours();
 
         if (periodo === 'matutino') return hora >= 6 && hora < 12;
@@ -62,19 +62,9 @@ export class EventsService {
       });
     }
 
-    if (startDate) {
-      const start = new Date(startDate);
-      filteredEvents = filteredEvents.filter((event) => event.date >= start);
-    }
-
-    if (endDate) {
-      const end = new Date(endDate);
-      filteredEvents = filteredEvents.filter((event) => event.date <= end);
-    }
-
     const sortedEvents = filteredEvents.sort((a, b) => {
-      const valueA = a[sort];
-      const valueB = b[sort];
+      const valueA = a[sort as keyof Event];
+      const valueB = b[sort as keyof Event];
 
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
