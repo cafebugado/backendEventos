@@ -24,6 +24,7 @@ import { CreateEventDto, UpdateEventDto } from './dto';
 import { Event } from './entities/event.entity';
 import { FindAllEventsDto } from './dto/find-all-events.dto';
 import type { PaginatedResult } from '../../common/interfaces/pagination.interface';
+import { EventStatsDto } from './dto/event-stats.dto';
 
 @ApiTags('events')
 @Controller('events')
@@ -43,11 +44,28 @@ export class EventsController {
     return this.eventsService.create(createEventDto);
   }
 
-@Get()
+  @Get()
   @ApiOperation({ summary: 'List all events with sorting options' })
-  @ApiResponse({ status: 200, description: 'List of all events', type: [Event] })
-  findAll(@Query() query: FindAllEventsDto) : PaginatedResult<Event> {
+  @ApiResponse({
+    status: 200,
+    description: 'List of all events',
+    type: [Event],
+  })
+  findAll(@Query() query: FindAllEventsDto): PaginatedResult<Event> {
     return this.eventsService.findAll(query);
+  }
+
+  @Get('stats')
+  @ApiOperation({
+    summary: 'Obter estatísticas consolidadas dos eventos por período',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Estatísticas retornadas com sucesso.',
+    type: EventStatsDto,
+  })
+  getStats(): EventStatsDto {
+    return this.eventsService.getStats();
   }
 
   @Get(':id')
