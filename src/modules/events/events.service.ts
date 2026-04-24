@@ -28,20 +28,30 @@ export class EventsService {
   }
 
   findAll(query: FindAllEventsDto = {}): PaginatedResult<Event> {
-    const { page = 1, limit = 9, sort = 'date', order = 'asc', search, periodo } = query;
-    let eventsToProcess = this.events;
+    const {
+      page = 1,
+      limit = 9,
+      sort = 'date',
+      order = 'asc',
+      search,
+      periodo,
+    } = query;
+    let filteredEvents = this.events;
 
     if (search) {
       const termoBusca = search.toLowerCase();
-      eventsToProcess = eventsToProcess.filter((event) => {
-        const matchName = event.name && event.name.toLowerCase().includes(termoBusca);
-        const matchDesc = event.description && event.description.toLowerCase().includes(termoBusca);
+      filteredEvents = filteredEvents.filter((event) => {
+        const matchName =
+          event.name && event.name.toLowerCase().includes(termoBusca);
+        const matchDesc =
+          event.description &&
+          event.description.toLowerCase().includes(termoBusca);
         return matchName || matchDesc;
       });
     }
 
     if (periodo) {
-      eventsToProcess = eventsToProcess.filter((event) => {
+      filteredEvents = filteredEvents.filter((event) => {
         const hora = new Date(event.date).getHours();
 
         if (periodo === 'matutino') return hora >= 6 && hora < 12;
@@ -52,9 +62,9 @@ export class EventsService {
       });
     }
 
-    const sortedEvents = [...eventsToProcess].sort((a, b) => {
-      const valueA = a[sort];
-      const valueB = b[sort];
+    const sortedEvents = filteredEvents.sort((a, b) => {
+      const valueA = a[sort as keyof Event];
+      const valueB = b[sort as keyof Event];
 
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
@@ -64,12 +74,11 @@ export class EventsService {
     const total = sortedEvents.length;
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
-
-    const data = sortedEvents.slice(startIndex, endIndex);
+    const paginatedData = sortedEvents.slice(startIndex, endIndex);
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data,
+      data: paginatedData,
       meta: {
         total,
         page,
@@ -125,7 +134,7 @@ export class EventsService {
 
         return stats;
       },
-      { total: 0, matutino: 0, vespertino: 0, noturno: 0 }
+      { total: 0, matutino: 0, vespertino: 0, noturno: 0 },
     );
   }
 

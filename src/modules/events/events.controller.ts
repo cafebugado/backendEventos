@@ -29,7 +29,7 @@ import { EventStatsDto } from './dto/event-stats.dto';
 @ApiTags('events')
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) { }
+  constructor(private readonly eventsService: EventsService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new event' })
@@ -46,17 +46,23 @@ export class EventsController {
 
   @Get()
   @ApiOperation({ summary: 'List all events with sorting options' })
-  @ApiResponse({ status: 200, description: 'List of all events', type: [Event] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all events',
+    type: [Event],
+  })
   findAll(@Query() query: FindAllEventsDto): PaginatedResult<Event> {
     return this.eventsService.findAll(query);
   }
 
   @Get('stats')
-  @ApiOperation({ summary: 'Obter estatísticas consolidadas dos eventos por período' })
+  @ApiOperation({
+    summary: 'Obter estatísticas consolidadas dos eventos por período',
+  })
   @ApiResponse({
     status: 200,
     description: 'Estatísticas retornadas com sucesso.',
-    type: EventStatsDto
+    type: EventStatsDto,
   })
   getStats(): EventStatsDto {
     return this.eventsService.getStats();

@@ -6,10 +6,8 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS
   app.enableCors();
 
-  // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -18,13 +16,13 @@ async function bootstrap() {
     }),
   );
 
-  // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('Backend Eventos API')
     .setDescription('API para gerenciamento de eventos')
     .setVersion('1.0')
     .addTag('events', 'Endpoints para gerenciamento de eventos')
     .addTag('health', 'Endpoints de health check')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
