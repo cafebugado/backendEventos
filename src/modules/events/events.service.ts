@@ -36,11 +36,11 @@ export class EventsService {
       search,
       periodo,
     } = query;
-    let eventsToProcess = this.events;
+    let filteredEvents = this.events;
 
     if (search) {
       const termoBusca = search.toLowerCase();
-      eventsToProcess = eventsToProcess.filter((event) => {
+      filteredEvents = filteredEvents.filter((event) => {
         const matchName =
           event.name && event.name.toLowerCase().includes(termoBusca);
         const matchDesc =
@@ -51,7 +51,7 @@ export class EventsService {
     }
 
     if (periodo) {
-      eventsToProcess = eventsToProcess.filter((event) => {
+      filteredEvents = filteredEvents.filter((event) => {
         const hora = new Date(event.date).getHours();
 
         if (periodo === 'matutino') return hora >= 6 && hora < 12;
@@ -62,9 +62,9 @@ export class EventsService {
       });
     }
 
-    const sortedEvents = [...eventsToProcess].sort((a, b) => {
-      const valueA = this.getSortValue(a, sort);
-      const valueB = this.getSortValue(b, sort);
+    const sortedEvents = filteredEvents.sort((a, b) => {
+      const valueA = a[sort as keyof Event];
+      const valueB = b[sort as keyof Event];
 
       if (valueA < valueB) return order === 'asc' ? -1 : 1;
       if (valueA > valueB) return order === 'asc' ? 1 : -1;
@@ -144,20 +144,5 @@ export class EventsService {
     if (hora >= 6 && hora < 12) return 'matutino';
     if (hora >= 12 && hora < 18) return 'vespertino';
     return 'noturno';
-  }
-
-  private getSortValue(
-    event: Event,
-    sort: 'date' | 'name' | 'createdAt',
-  ): number | string {
-    if (sort === 'name') {
-      return event.name.toLowerCase();
-    }
-
-    if (sort === 'createdAt') {
-      return event.createdAt.getTime();
-    }
-
-    return event.date.getTime();
   }
 }
