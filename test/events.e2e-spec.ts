@@ -113,6 +113,10 @@ describe('EventsController (e2e)', () => {
         limit: expect.any(Number),
         totalPages: expect.any(Number),
       });
+      expect(Array.isArray(response.body)).toBe(true);
+      expect((response.body as EventResponse[]).length).toBeGreaterThanOrEqual(
+        1,
+      );
     });
   });
 
@@ -132,6 +136,8 @@ describe('EventsController (e2e)', () => {
       expect(body.meta.limit).toBe(9);
       expect(body.meta.total).toBeGreaterThanOrEqual(1);
       expect(body.meta.totalPages).toBeGreaterThanOrEqual(1);
+      expect((response.body as EventResponse).id).toBe(createdEventId);
+      expect((response.body as EventResponse).name).toBe(createEventDto.name);
     });
 
     it('should return 404 for non-existent event', async () => {
